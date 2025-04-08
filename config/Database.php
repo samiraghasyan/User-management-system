@@ -1,14 +1,16 @@
 <?php
 
-declare(strict_types = 1);
-namespace App\Database;
+declare(strict_types=1);
+
+namespace config\Database;
 
 use PDO;
 use PDOException;
 use PDOStatement;
 use Throwable;
 
-final class Database{
+final class Database
+{
 
     private static ?self $instance = null;
     private PDO $connection;
@@ -22,24 +24,24 @@ final class Database{
         string $dbname,
         string $username,
         string $password,
-        array $options = []
+        array  $options = []
     )
     {
         $defultOptions = [
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-          PDO::ATTR_EMULATE_PREPARES => false,
-          PDO::ATTR_STRINGIFY_FETCHES => false,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_STRINGIFY_FETCHES => false,
         ];
 
         $finalOptions = $options + $defultOptions;
         $dsn = "mysql:host=$host;$dbname=$dbname;charset=utf8mb4";
 
-        try{
-            $this->connection = new PDO($dsn,$username,$password,$finalOptions);
-        }catch (PDOException $e){
+        try {
+            $this->connection = new PDO($dsn, $username, $password, $finalOptions);
+        } catch (PDOException $e) {
             throw new DatabaseConnectionExciption(
-              "Connection failed: " . $e->getMessage(),
+                "Connection failed: " . $e->getMessage(),
                 (int)$e->getCode()
             );
         }
@@ -54,10 +56,11 @@ final class Database{
         string $dbname,
         string $username,
         string $password,
-        array $options = []
-    ): self{
-        if(self::$instance === null){
-            self::$instance = new self($host,$dbname,$username,$password,$options);
+        array  $options = []
+    ): self
+    {
+        if (self::$instance === null) {
+            self::$instance = new self($host, $dbname, $username, $password, $options);
         }
         return self::$instance;
     }
@@ -73,7 +76,7 @@ final class Database{
             $this->bindValues($stmt, $params);
             $stmt->execute();
             return $stmt->rowCount();
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             throw new QueryExecutionException(
                 "Query execution failed: " . $e->getMessage(),
                 (int)$e->getCode()
@@ -89,7 +92,7 @@ final class Database{
             $this->bindValues($stmt, $params);
             $stmt->execute();
             return $stmt->fetch() ?: null;
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             throw new QueryExecutionException(
                 "Fetch query failed: " . $e->getMessage(),
                 (int)$e->getCode()
@@ -105,7 +108,7 @@ final class Database{
             $this->bindValues($stmt, $params);
             $stmt->execute();
             return $stmt->fetchAll();
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             throw new QueryExecutionException(
                 "Fetch all query failed: " . $e->getMessage(),
                 (int)$e->getCode()
@@ -117,7 +120,7 @@ final class Database{
     {
         try {
             $this->connection->beginTransaction();
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             throw new TransactionException(
                 "Transaction start failed: " . $e->getMessage(),
                 (int)$e->getCode()
@@ -129,7 +132,7 @@ final class Database{
     {
         try {
             $this->connection->commit();
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             throw new TransactionException(
                 "Transaction commit failed: " . $e->getMessage(),
                 (int)$e->getCode()
@@ -141,7 +144,7 @@ final class Database{
     {
         try {
             $this->connection->rollBack();
-        }catch (PDOException $e){
+        } catch (PDOException $e) {
             throw new TransactionException(
                 "Transaction rollback failed: " . $e->getMessage(),
                 (int)$e->getCode()
@@ -161,8 +164,8 @@ final class Database{
 
     private function bindValues(PDOStatement $stmt, array $params): void
     {
-        foreach ($params as $key => $value){
-            $type = match (true){
+        foreach ($params as $key => $value) {
+            $type = match (true) {
                 is_int($value) => PDO::PARAM_INT,
                 is_bool($value) => PDO::PARAM_BOOL,
                 is_null($value) => PDO::PARAM_NULL,
@@ -172,7 +175,8 @@ final class Database{
         }
     }
 
-    private function __clone(){
+    private function __clone()
+    {
 
     }
 
@@ -182,6 +186,14 @@ final class Database{
     }
 }
 
-class DatabaseException extends \RuntimeException {}
-class QueryExecutionException extends \RuntimeException {}
-class TransactionException extends \RuntimeException {}
+class DatabaseException extends \RuntimeException
+{
+}
+
+class QueryExecutionException extends \RuntimeException
+{
+}
+
+class TransactionException extends \RuntimeException
+{
+}

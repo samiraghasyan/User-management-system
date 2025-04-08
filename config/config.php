@@ -2,6 +2,6 @@
 
 
 define('DBHOST', 'localhost');
-define('DBNAME', 'UMS');
+define('DBNAME', 'ums');
 define('DBUSERNAME', 'root');
 define('DBPASSWORD', '');
